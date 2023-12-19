@@ -11,7 +11,7 @@
       </thead>
       <tbody>
         <tr v-for="(user, index) in users" :key="index">
-          <td>{{ user.name }}</td>
+          <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>
             <button class="btn btn-primary" @click="editUser(index)">Editar</button>
@@ -25,29 +25,36 @@
 </template>
 
 <script>
+import ApiService from '@/services/ApiService';
+
 export default {
   data() {
     return {
-      users: [
-        { name: 'Usuario 1', email: 'usuario1@example.com' },
-        { name: 'Usuario 2', email: 'usuario2@example.com' },
-        // Agrega más usuarios según sea necesario
-      ],
+      users: [],
     };
   },
   methods: {
+    async fetchUsers() {
+      try {
+        const users = await ApiService.getUsers();
+        this.users = users;
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    },
+
     editUser(index) {
-      // Implementa la lógica para editar el usuario
       console.log('Editar usuario:', this.users[index]);
     },
     deleteUser(index) {
-      // Implementa la lógica para eliminar el usuario
       console.log('Eliminar usuario:', this.users[index]);
     },
     registerUser() {
-      // Implementa la lógica para registrar un nuevo usuario
       console.log('Registrar nuevo usuario');
     },
+  },
+  mounted() {
+    this.fetchUsers();
   },
 };
 </script>
@@ -60,7 +67,7 @@ export default {
   padding: 20px;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  min-height: 70vh; /* Mínimo 70% de la altura de la ventana */
+  min-height: 70vh; 
   display: flex;
   flex-direction: column;
   align-items: center;

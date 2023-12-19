@@ -30,6 +30,8 @@ export default {
       ApiService.login(this.username, this.password)
         .then((response) => {
           console.log('Login successful:', response);
+          const token = response.token;
+          localStorage.setItem('token', token);
           // Puedes manejar la respuesta y redirigir al usuario según tus necesidades
           this.$router.push('/user');
         })
