@@ -14,50 +14,117 @@
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>
-            <button class="btn btn-primary" @click="editUser(index)">Editar</button>
+            <button class="btn btn-primary" @click="openModal('edit', user)">Editar</button>
             <button class="btn btn-danger" @click="deleteUser(index)">Eliminar</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <button class="btn btn-success" @click="registerUser">Registrar Nuevo Usuario</button>
+    <button class="btn btn-success" @click="openModal('register')">Registrar Nuevo Usuario</button>
+    <user-modal 
+      v-if="isModalVisible" 
+      @form-submit="handleFormSubmit" 
+      @modal-closed="handleModalClosed" 
+      :user="modalUser" 
+      :mode="modalMode" 
+    />
   </div>
 </template>
 
 <script>
+import { ref, onMounted, watchEffect } from 'vue';
 import ApiService from '@/services/ApiService';
+import UserModal from '@/components/UserModal.vue';
+import Swal from 'sweetalert2/dist/sweetalert2.all.js';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 export default {
-  data() {
-    return {
-      users: [],
-    };
+  components: {
+    UserModal
   },
-  methods: {
-    async fetchUsers() {
+  setup() {
+    const users = ref([]);
+    const isModalVisible = ref(false);
+    const modalMode = ref(null);
+    const modalUser = ref(null);
+
+    const openModal = (mode, user) => {
+      isModalVisible.value = true;
+      modalMode.value = mode;
+      modalUser.value = mode === 'edit' ? { ...user } : null;
+    };
+
+    const handleModalClosed = () => {
+      isModalVisible.value = false;
+      modalMode.value = null;
+      modalUser.value = null;
+    };
+
+    const handleFormSubmit = async () => {
+      await fetchUsers();
+      isModalVisible.value = false;
+    };
+
+    const fetchUsers = async () => {
       try {
-        const users = await ApiService.getUsers();
-        this.users = users;
+        const fetchedUsers = await ApiService.getUsers();
+        users.value = fetchedUsers;
       } catch (error) {
         console.error('Error fetching users:', error);
       }
-    },
+    };
 
-    editUser(index) {
-      console.log('Editar usuario:', this.users[index]);
-    },
-    deleteUser(index) {
-      console.log('Eliminar usuario:', this.users[index]);
-    },
-    registerUser() {
-      console.log('Registrar nuevo usuario');
-    },
-  },
-  mounted() {
-    this.fetchUsers();
-  },
+    const deleteUser = async (index) => {
+      const userId = users.value[index].id;
+      try {
+        const result = await Swal.fire({
+          title: '¿Estás seguro?',
+          text: '¡No podrás revertir esto!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Sí, elimínalo'
+        });
+
+        if (result.isConfirmed) {
+          await ApiService.deleteUser(userId);
+          await fetchUsers();
+          Swal.fire('Eliminado', 'El usuario ha sido eliminado.', 'success');
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        Swal.fire('Error', 'Hubo un error al eliminar el usuario.', 'error');
+      }
+    };
+
+    const handleUserUpdated = () => {
+      console.log("ejecuta fetchUsers")
+      fetchUsers();
+    };
+
+    onMounted(() => {
+      fetchUsers();
+    });
+
+    watchEffect(() => {
+    });
+
+    return {
+      users,
+      isModalVisible,
+      modalMode,
+      modalUser,
+      openModal,
+      handleModalClosed,
+      handleFormSubmit,
+      handleUserUpdated,
+      deleteUser
+    };
+  }
 };
 </script>
+
 
 <style scoped>
 .user-container {

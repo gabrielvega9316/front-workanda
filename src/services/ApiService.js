@@ -30,4 +30,34 @@ export default {
       throw error;
     }
   },
+
+  registerUser: async (userData) => {
+    try {
+      const response = await axios.post(`${apiUrl}/users`, userData);
+      return response.data;
+    } catch (error) {
+      console.error('Error registering user:', error);
+      throw error;
+    }
+  },
+  
+  updateUser: async (user) => {
+    try {
+      const response = await axios.put(`${apiUrl}/users/${user.id}`, user);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
+  },
+
+  deleteUser: async (userId) => {
+    try {
+      const response = await axios.delete(`${apiUrl}/users/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  },
 };
