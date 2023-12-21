@@ -61,9 +61,8 @@
         
         this.$emit('submit', { user: this.localUser, mode: this.mode });
       } catch (error) {
-        console.error('Error submitting form:', error);
         const $toast = useToast();
-        $toast.error('Error submitting form', {
+        $toast.error(error.response.data.error, {
           position: 'top'
           })
       }

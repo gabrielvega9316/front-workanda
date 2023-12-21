@@ -31,7 +31,6 @@ export default {
     login() {
       ApiService.login(this.username, this.password)
         .then((response) => {
-          console.log('Login successful:', response);
           const token = response.token;
           localStorage.setItem('token', token);
           this.$router.push('/user');
