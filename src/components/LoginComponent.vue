@@ -17,6 +17,8 @@
 
 <script>
 import ApiService from '@/services/ApiService';
+import { useToast } from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 
 export default {
   data() {
@@ -32,12 +34,14 @@ export default {
           console.log('Login successful:', response);
           const token = response.token;
           localStorage.setItem('token', token);
-          // Puedes manejar la respuesta y redirigir al usuario según tus necesidades
           this.$router.push('/user');
         })
         .catch((error) => {
           console.error('Login failed:', error);
-          // Puedes manejar el error, mostrar un mensaje al usuario, etc.
+          const $toast = useToast();
+        $toast.error('Error, please enter correct username and password', {
+          position: 'top'
+          })
         });
     },
   },

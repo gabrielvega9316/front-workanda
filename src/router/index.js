@@ -3,6 +3,7 @@ import Login from '../components/LoginComponent.vue';
 import User from '../components/UserComponent.vue';
 
 const routes = [
+  { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
   { path: '/user', component: User },
 ];

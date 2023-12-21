@@ -28,6 +28,8 @@
       :user="modalUser" 
       :mode="modalMode" 
     />
+
+    <button class="btn btn-warning" @click="logout">Cerrar Sesión</button>
   </div>
 </template>
 
@@ -37,6 +39,7 @@ import ApiService from '@/services/ApiService';
 import UserModal from '@/components/UserModal.vue';
 import Swal from 'sweetalert2/dist/sweetalert2.all.js';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import { useRouter } from 'vue-router';
 
 export default {
   components: {
@@ -98,17 +101,19 @@ export default {
       }
     };
 
-    const handleUserUpdated = () => {
-      console.log("ejecuta fetchUsers")
-      fetchUsers();
-    };
-
     onMounted(() => {
       fetchUsers();
     });
 
     watchEffect(() => {
     });
+
+    const router = useRouter();
+
+    const logout = () => {
+      localStorage.removeItem('token');
+      router.push('/login');
+    };
 
     return {
       users,
@@ -118,8 +123,8 @@ export default {
       openModal,
       handleModalClosed,
       handleFormSubmit,
-      handleUserUpdated,
-      deleteUser
+      deleteUser,
+      logout
     };
   }
 };
